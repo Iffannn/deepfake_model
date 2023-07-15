@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Video Upload</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <input type="file" id="video-input" accept="video/*" />
+    <video id="video-player" controls></video>
+    <button id="upload-button">Upload Video</button>
+
+    <p id="prediction-result">Prediction: <span id="prediction"></span>, Confidence: <span id="confidence"></span></p>
+
+
+    <script>
+        $(document).ready(function () {
+            // Event listener for file input change
+            $('#video-input').change(function () {
+                var file = this.files[0];
+                var videoURL = URL.createObjectURL(file);
+
+                // Display video in the video player
+                $('#video-player').attr('src', videoURL);
+            });
+
+            // Event listener for upload button click
+            $('#upload-button').click(function () {
+                var file = $('#video-input').prop('files')[0];
+                var formData = new FormData();
+                formData.append('video', file);
+
+                // Send AJAX request to upload the video
+                $.ajax({
+                    url: '/upload-video',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    // success: function (response) {
+                    //     var videoContainer = $('#video-container');
+                    //     videoContainer.empty();
+                    //     videoContainer.append('<video controls><source src="' + response.message + '" type="video/mp4"></video>');
+                    // },
+                    success: function (response) {
+                        var videoContainer = $('#video-player');
+                        videoContainer.empty();
+                        videoContainer.attr('src', response.message);
+
+                        var prediction = response.prediction === 1 ? 'FAKE' : 'REAL';
+                        var confidence = response.confidence.toFixed(2);
+
+                        $('#prediction').text(prediction);
+                        $('#confidence').text(confidence + '%');
+                    },
+
+                    error: function (error) {
+                        console.error('Error uploading video:', error);
+                    }
+                });
+
+            });
+
+        });
+    </script>
+</body>
+
+</html>
