@@ -128,8 +128,16 @@ def predict(model, video_dataset):
 
     return predictions, confidences
 
+ALLOWED_EXTENSIONS = {"mp4"}
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.post("/upload-video")
 async def upload_video(video: UploadFile = File(...)):
+    if not allowed_file(video.filename):
+        return {"error": "Only MP4 files are allowed."}
+    
     file_path = os.path.join(IMAGEDIR, video.filename)
     with open(file_path, "wb") as f:
         f.write(video.file.read())
