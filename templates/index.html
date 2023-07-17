@@ -4,6 +4,13 @@
 <head>
     <title>Video Upload</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #loading-animation {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,6 +20,13 @@
 
     <p id="prediction-result">Prediction: <span id="prediction"></span>, Confidence: <span id="confidence"></span></p>
 
+    <div id="loading-animation">
+        <img src="https://media.tenor.com/XasjKGMk_wAAAAAC/load-loading.gif" alt="Loading" />
+        <p>Loading...</p>
+    </div>
+
+    <!-- Add the "Print to PDF" button -->
+    <button id="print-pdf-button">Print to PDF</button>
 
     <script>
         $(document).ready(function () {
@@ -34,10 +48,13 @@
                     alert('Only MP4 files are allowed.');
                     return;
                 }
-                
+
                 var formData = new FormData();
                 formData.append('video', file);
-                
+
+                // Show loading animation
+                $('#loading-animation').show();
+
                 // Send AJAX request to upload the video
                 $.ajax({
                     url: '/upload-video',
@@ -45,12 +62,11 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    // success: function (response) {
-                    //     var videoContainer = $('#video-container');
-                    //     videoContainer.empty();
-                    //     videoContainer.append('<video controls><source src="' + response.message + '" type="video/mp4"></video>');
-                    // },
+
                     success: function (response) {
+                        // Hide loading animation
+                        $('#loading-animation').hide();
+
                         var videoContainer = $('#video-player');
                         videoContainer.empty();
                         videoContainer.attr('src', response.message);
@@ -63,10 +79,18 @@
                     },
 
                     error: function (error) {
+                        // Hide loading animation
+                        $('#loading-animation').hide();
+
                         console.error('Error uploading video:', error);
                     }
                 });
 
+            });
+
+            // Event listener for print to PDF button click
+            $('#print-pdf-button').click(function () {
+                window.print();
             });
 
         });
