@@ -28,9 +28,16 @@
             // Event listener for upload button click
             $('#upload-button').click(function () {
                 var file = $('#video-input').prop('files')[0];
+
+                // Check file extension
+                if (file.type !== 'video/mp4') {
+                    alert('Only MP4 files are allowed.');
+                    return;
+                }
+                
                 var formData = new FormData();
                 formData.append('video', file);
-
+                
                 // Send AJAX request to upload the video
                 $.ajax({
                     url: '/upload-video',
